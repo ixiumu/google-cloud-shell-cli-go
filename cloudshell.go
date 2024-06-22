@@ -49,14 +49,14 @@ type CloudShellEnv struct {
 
 //******************************************************************************************
 // Method: users.environments.get
-// https://cloud.google.com/shell/docs/reference/rest/v1alpha1/users.environments/get
+// https://cloud.google.com/shell/docs/reference/rest/v1/users.environments/get
 //******************************************************************************************
 
 func cloud_shell_get_environment(accessToken string, flag_info bool) (CloudShellEnv, error) {
 
 	var params CloudShellEnv
 
-	endpoint := "https://cloudshell.googleapis.com/v1alpha1/users/me/environments/default"
+	endpoint := "https://cloudshell.googleapis.com/v1/users/me/environments/default"
 	endpoint += "?alt=json"
 
 	if config.UrlFetch != "" {
@@ -114,7 +114,7 @@ func cloud_shell_get_environment(accessToken string, flag_info bool) (CloudShell
 
 //******************************************************************************************
 // Method: users.environment.start
-// https://cloud.google.com/shell/docs/reference/rest/v1alpha1/users.environments/start
+// https://cloud.google.com/shell/docs/reference/rest/v1/users.environments/start
 //******************************************************************************************
 
 func cloudshell_start(accessToken string) error {
@@ -126,7 +126,7 @@ func cloudshell_start(accessToken string) error {
 		fmt.Println("Request users.environment.start")
 	}
 
-	endpoint := "https://cloudshell.googleapis.com/v1alpha1/users/me/environments/default"
+	endpoint := "https://cloudshell.googleapis.com/v1/users/me/environments/default"
 	endpoint += ":start"
 	endpoint += "?alt=json"
 
@@ -185,7 +185,7 @@ func cloud_shell_create_publickeys(accessToken string) error {
 
 	fmt.Println("Pushing your public key to Cloud Shell...")
 
-	endpoint := "https://cloudshell.googleapis.com/v1alpha1/users/me/environments/default/publicKeys"
+	endpoint := "https://cloudshell.googleapis.com/v1/users/me/environments/default/publicKeys"
 	endpoint += "?alt=json"
 
 	if config.UrlFetch != "" {
