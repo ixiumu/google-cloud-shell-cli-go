@@ -63,7 +63,7 @@ func cloud_shell_get_environment(accessToken string, flag_info bool) (CloudShell
 		endpoint = config.UrlFetch + endpoint
 	}
 
-	req := HttpRequest.NewRequest()
+	req := HttpRequest.NewRequest().SetTimeout(5 * time.Second)
 
 	req.SetHeaders(map[string]string{
 		"Authorization":       "Bearer " + accessToken,
@@ -134,7 +134,7 @@ func cloudshell_start(accessToken string) error {
 		endpoint = config.UrlFetch + endpoint
 	}
 
-	req := HttpRequest.NewRequest()
+	req := HttpRequest.NewRequest().SetTimeout(5 * time.Second)
 
 	req.SetHeaders(map[string]string{
 		"Authorization":       "Bearer " + accessToken,
@@ -192,7 +192,7 @@ func cloud_shell_create_publickeys(accessToken string) error {
 		endpoint = config.UrlFetch + endpoint
 	}
 
-	req := HttpRequest.NewRequest()
+	req := HttpRequest.NewRequest().SetTimeout(5 * time.Second)
 
 	req.SetHeaders(map[string]string{
 		"Authorization":       "Bearer " + accessToken,

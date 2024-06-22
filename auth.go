@@ -214,7 +214,7 @@ func doRefresh(filename string) (string, bool) {
 	content += "grant_type=refresh_token&"
 	content += "refresh_token=" + creds.RefreshToken
 
-	req := HttpRequest.NewRequest()
+	req := HttpRequest.NewRequest().SetTimeout(5 * time.Second)
 
 	req.SetHeaders(map[string]string{"Content-Type": "application/x-www-form-urlencoded"})
 
@@ -274,7 +274,7 @@ func debug_displayAccessToken(accessToken string) {
 		endpoint = config.UrlFetch + endpoint
 	}
 
-	req := HttpRequest.NewRequest()
+	req := HttpRequest.NewRequest().SetTimeout(5 * time.Second)
 
 	req.SetHeaders(map[string]string{"Authorization": "Bearer " + accessToken})
 
@@ -303,7 +303,7 @@ func debug_displayUserInfo(accessToken string) {
 		endpoint = config.UrlFetch + endpoint
 	}
 
-	req := HttpRequest.NewRequest()
+	req := HttpRequest.NewRequest().SetTimeout(5 * time.Second)
 
 	req.SetHeaders(map[string]string{"Authorization": "Bearer " + accessToken})
 
@@ -524,9 +524,9 @@ func processAuthCode(secrets ClientSecrets, auth_code string) (string, error) {
 
 	endpoint := "https://www.googleapis.com/oauth2/v4/token"
 
-	req := HttpRequest.NewRequest()
+	req := HttpRequest.NewRequest().SetTimeout(5 * time.Second)
 
-	req.SetHeaders(map[string]string{"Content-Type": "application/x-www-form-urlencoded"})
+	//req.SetHeaders(map[string]string{"Content-Type": "application/x-www-form-urlencoded"})
 
 	res, err := req.Post(endpoint, content)
 
