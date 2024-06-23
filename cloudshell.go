@@ -65,9 +65,12 @@ func cloud_shell_get_environment(accessToken string, flag_info bool) (CloudShell
 
 	req := HttpRequest.NewRequest().SetTimeout(5 * time.Second)
 
-	req.SetHeaders(map[string]string{
+	hdrs := map[string]string{
 		"Authorization":       "Bearer " + accessToken,
-		"X-Goog-User-Project": config.ProjectId})
+		"X-Goog-User-Project": config.ProjectId,
+	}
+
+	req.SetHeaders(hdrs)
 
 	if config.Debug == true {
 		fmt.Println("Access Token:", accessToken)
@@ -136,9 +139,12 @@ func cloudshell_start(accessToken string) error {
 
 	req := HttpRequest.NewRequest().SetTimeout(5 * time.Second)
 
-	req.SetHeaders(map[string]string{
+	hdrs := map[string]string{
 		"Authorization":       "Bearer " + accessToken,
-		"X-Goog-User-Project": config.ProjectId})
+		"X-Goog-User-Project": config.ProjectId,
+	}
+
+	req.SetHeaders(hdrs)
 
 	res, err := req.JSON().Post(endpoint, "{\"accessToken\": \""+accessToken+"\"}")
 
@@ -334,14 +340,6 @@ func call_cloud_shell(accessToken string) {
 
 	flag_info := false
 
-	if config.Command == CMD_EXEC {
-		flag_info = false
-	}
-
-	if config.Debug == true {
-		flag_info = true
-	}
-
 	if config.Command == CMD_INFO {
 		flag_info = true
 	}
@@ -384,10 +382,11 @@ func call_cloud_shell(accessToken string) {
 			}
 
 			if params.State == "RUNNING" {
-				fmt.Println("Waiting for your Cloud Shell machine to start...")
-				// Increase waiting time
-				// time.Sleep(5000 * time.Millisecond)
-
+				// FIX
+				// Sleep to allow the CloudShell VM to start responding
+				// I don't know how long this really takes
+				// Perhaps a connection attempt is required
+				time.Sleep(5000 * time.Millisecond)
 				break
 			}
 		}
@@ -423,6 +422,14 @@ func call_cloud_shell(accessToken string) {
 		return
 	}
 
+	if config.Command == CMD_PUTTY {
+		exec_putty(params)
+	}
+
+	if config.Command == CMD_INLINE_SSH {
+		exec_inline_ssh(params)
+	}
+
 	if config.Command == CMD_WINSSH {
 		fmt.Println("Your Cloud Shell machine is RUNNING, connecting...")
 		exec_winssh(params)
@@ -444,8 +451,16 @@ func call_cloud_shell(accessToken string) {
 		sftp_upload(params)
 	}
 
-	if config.Command == CMD_PUTTY {
-		exec_putty(params)
+	if config.Command == CMD_BENCHMARK_DOWNLOAD {
+		sftp_benchmark_download(params)
+	}
+
+	if config.Command == CMD_BENCHMARK_UPLOAD {
+		sftp_benchmark_upload(params)
+	}
+
+	if config.Command == CMD_BITVISE {
+		exec_bitvise(params)
 	}
 
 	if config.Command == CMD_WINSCP {

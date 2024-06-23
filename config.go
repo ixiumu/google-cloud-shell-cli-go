@@ -66,6 +66,9 @@ type Config struct {
 
 	// api proxy
 	UrlFetch string
+
+	// Commands "benchmark download" and "benchark upload"
+	benchmark_size int64
 }
 
 var config Config
@@ -133,6 +136,14 @@ func init_config() error {
 			config.winscpFlags = append([]string{"/rawsettings"}, strings.Fields(configJson.WinscpFlags)...)
 		}
 
+	}
+
+	config.ClientSecretsFile = configJson.ClientSecretsFile
+
+	// fmt.Println("Client Secrets File:", config.ClientSecretsFile)
+
+	if configJson.WinscpFlags != "" {
+		config.WinscpFlags = append([]string{"/rawsettings"}, strings.Fields(configJson.WinscpFlags)...)
 	}
 
 	process_cmdline()

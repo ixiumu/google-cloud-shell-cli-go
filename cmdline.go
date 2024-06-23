@@ -10,26 +10,33 @@ import (
 
 // Commands for this program
 const (
-	CMD_INFO = iota
-	CMD_WINSSH
+	CMD_NONE = iota
+	CMD_INFO
+	CMD_PUTTY
 	CMD_SSH
-	CMD_SSH_VSCODE
+	CMD_INLINE_SSH
+	CMD_WINSSH
 	CMD_EXEC
 	CMD_UPLOAD
 	CMD_DOWNLOAD
-	CMD_PUTTY
+	CMD_BITVISE
 	CMD_WINSCP
+	CMD_BENCHMARK_DOWNLOAD
+	CMD_BENCHMARK_UPLOAD
+	CMD_SSH_VSCODE
 	CREATE_PUBKEY
 )
 
 func process_cmdline() {
+	config.Command = CMD_NONE
+
 	if len(os.Args) < 2 {
 		cmd_help()
 		os.Exit(0)
 	}
 
 	for _, arg := range os.Args {
-		if arg == "--help" {
+		if arg == "-help" || arg == "--help" {
 			cmd_help()
 			os.Exit(0)
 		}
@@ -147,6 +154,17 @@ func process_cmdline() {
 			x++
 			continue
 		}
+		// WINSCP args
+		if strings.HasPrefix(arg, "/rawsettings") {
+			// config.sshFlags = append(config.sshFlags, os.Args[x:]...)
+			config.WinscpFlags = os.Args[x:]
+			break
+		}
+
+		if strings.HasPrefix(arg, "-") {
+			fmt.Println("Error: Unknown option: " + arg)
+			os.Exit(1)
+		}
 
 		args = append(args, arg)
 	}
@@ -154,6 +172,11 @@ func process_cmdline() {
 	// fmt.Println("Debug:", config.Debug)
 	// fmt.Println("Auth:", config.Flags.Auth)
 	// fmt.Println("Login:", config.Flags.Login)
+
+	if len(args) == 0 {
+		cmd_help()
+		os.Exit(0)
+	}
 
 	for x := 0; x < len(args); x++ {
 		arg := args[x]
@@ -164,19 +187,26 @@ func process_cmdline() {
 
 		case "ssh":
 			if isWindows() == true {
-				config.Command = CMD_WINSSH
+				config.Command = CMD_INLINE_SSH
 			} else {
 				config.Command = CMD_SSH
 			}
 
-			// argString := strings.Join(args, ",")
-			// if strings.Contains(argString, "-D,") {
-			// 	config.Flags.BindAddress = args[x + 2]
+		case "bitvise":
+			if isWindows() == true {
+				config.Command = CMD_BITVISE
+			} else {
+				fmt.Println("Error: This command is only supported on Windows. For Linux use ssh")
+				os.Exit(1)
+			}
 
-			// 	// break
-			// 	return
-			// }
-			return
+		case "winssh":
+			if isWindows() == true {
+				config.Command = CMD_WINSSH
+			} else {
+				fmt.Println("Error: This command is only supported on Windows. For Linux use ssh")
+				os.Exit(1)
+			}
 
 		case "exec":
 			if len(args) < 2 {
@@ -265,12 +295,39 @@ func process_cmdline() {
 			config.Command = CREATE_PUBKEY
 			return
 
-		default:
-			if config.Command != 0 {
-				return
+		case "benchmark":
+			if len(args) < 2 {
+				fmt.Println("Error: expected download or upload option")
+				os.Exit(1)
 			}
+
+			x++
+
+			subcmd := args[x]
+
+			switch subcmd {
+			case "download":
+				config.Command = CMD_BENCHMARK_DOWNLOAD
+				config.benchmark_size = 128 * 1024
+				config.benchmark_size = 10240 * 1024
+
+			case "upload":
+				config.Command = CMD_BENCHMARK_UPLOAD
+				config.benchmark_size = 10240 * 1024
+
+			default:
+				fmt.Println("Error: expected a sub command (download, upload)")
+				os.Exit(1)
+			}
+
+		default:
+			if config.Command != CMD_NONE {
+				fmt.Println("Error: Unknown command line argument: ", arg)
+				os.Exit(1)
+			}
+
 			if isWindows() == true {
-				fmt.Println("Error: expected a command (info, putty, ssh, exec, upload, download)")
+				fmt.Println("Error: expected a command (info, putty, ssh, winssh, exec, upload, download)")
 			} else {
 				fmt.Println("Error: expected a command (info, ssh, exec, upload, download)")
 			}
@@ -281,16 +338,21 @@ func process_cmdline() {
 
 func cmd_help() {
 	fmt.Println("Usage: cloudshell [command]")
+	fmt.Println("  cloudshell                            - display cloudshell program help")
 	fmt.Println("  cloudshell info                       - display Cloud Shell information")
 	if isWindows() == true {
 		fmt.Println("  cloudshell putty                      - connect to Cloud Shell with Putty")
 		fmt.Println("  cloudshell winscp                     - connect to Cloud Shell with WinSCP")
 	}
 	fmt.Println("  cloudshell ssh                        - connect to Cloud Shell with SSH")
+	fmt.Println("  cloudshell winssh                     - connect to Cloud Shell with Windows OpenSSH")
+	fmt.Println("  cloudshell winscp                     - connect to Cloud Shell with Windows WinSCP")
+	fmt.Println("  cloudshell bitvise                    - connect to Cloud Shell with Windows Bitvise")
 	fmt.Println("  cloudshell exec \"command\"             - Execute remote command on Cloud Shell")
 	fmt.Println("  cloudshell upload src_file dst_file   - Upload local file to Cloud Shell")
 	fmt.Println("  cloudshell download src_file dst_file - Download from Cloud Shell to local file")
-	fmt.Println("  cloudshell push_pubkey                - Push your public key to Cloud Shell")
+	fmt.Println("  cloudshell benchmark download         - Benchmark download speed from Cloud Shell")
+	fmt.Println("  cloudshell benchmark upload           - Benchmark upload speed from Cloud Shell")
 	fmt.Println("")
 	fmt.Println("--debug - Turn on debug output")
 	fmt.Println("--adc  -  Use Application Default Credentials - Compute Engine only")
