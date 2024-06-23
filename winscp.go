@@ -22,7 +22,7 @@ func exec_winscp(params CloudShellEnv) {
 
 	args := append([]string{"/ini=nul", "/privatekey=" + key, "/hostkey=*", sshUrl}, config.WinscpFlags...)
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println(key)
 		fmt.Println(sshUsername)
 		fmt.Println(sshHost)

@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 )
-
 
 func sftp_benchmark_download(params CloudShellEnv) {
 	//************************************************************
@@ -25,7 +25,7 @@ func sftp_benchmark_download(params CloudShellEnv) {
 	defer connection.Close()
 	defer client.Close()
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Connected")
 	}
 
@@ -80,7 +80,7 @@ func sftp_benchmark_download(params CloudShellEnv) {
 
 		if err != nil {
 			fmt.Println(err)
-			break;
+			break
 		}
 
 		if count != bufsize {
@@ -121,7 +121,7 @@ func sftp_benchmark_upload(params CloudShellEnv) {
 	defer connection.Close()
 	defer client.Close()
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Connected")
 	}
 
@@ -184,7 +184,7 @@ func sftp_benchmark_upload(params CloudShellEnv) {
 
 		if err != nil {
 			fmt.Println(err)
-			break;
+			break
 		}
 
 		if count != bufsize {

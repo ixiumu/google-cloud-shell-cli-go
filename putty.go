@@ -18,7 +18,7 @@ func exec_putty(params CloudShellEnv) {
 	sshPort := fmt.Sprint(params.SshPort)
 	sshUrl := sshUsername + "@" + sshHost
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println(key)
 		fmt.Println(sshUsername)
 		fmt.Println(sshHost)

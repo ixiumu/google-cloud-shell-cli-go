@@ -64,7 +64,7 @@ func main() {
 	var accessToken = ""
 
 	// accessToken, idToken, err := get_tokens()
-	accessToken, err = get_tokens()
+	accessToken, _, err = get_tokens()
 
 	if err != nil {
 		os.Exit(1)

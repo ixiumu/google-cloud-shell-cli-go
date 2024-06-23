@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 )
@@ -30,7 +31,7 @@ func sftp_open_connection(params CloudShellEnv) (*ssh.Client, *sftp.Client, erro
 
 	host := sshHost + ":" + sshPort
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Dial: " + host)
 	}
 

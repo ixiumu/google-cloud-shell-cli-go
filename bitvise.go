@@ -10,7 +10,7 @@ import (
 // Also supports loading a profile
 // BvSsh.exe -profile=<full-path-to-profile.tlp>
 
-var path_bitvise =  "C:\\Program Files (x86)\\Bitvise SSH Client\\BvSsh.exe"
+var path_bitvise = "C:\\Program Files (x86)\\Bitvise SSH Client\\BvSsh.exe"
 
 func exec_bitvise(params CloudShellEnv) {
 	key, err := env_get_ssh_ppk()
@@ -27,13 +27,13 @@ func exec_bitvise(params CloudShellEnv) {
 
 	args := []string{}
 
-	args = append(args, "-host=" + sshHost)
-	args = append(args, "-port=" + sshPort)
-	args = append(args, "-user=" + sshUsername)
-	args = append(args, "-keypairFile=" + key)
+	args = append(args, "-host="+sshHost)
+	args = append(args, "-port="+sshPort)
+	args = append(args, "-user="+sshUsername)
+	args = append(args, "-keypairFile="+key)
 	args = append(args, "-loginOnStartup")
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println(key)
 		fmt.Println(sshUsername)
 		fmt.Println(sshHost)

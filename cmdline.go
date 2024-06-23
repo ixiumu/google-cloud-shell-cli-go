@@ -109,7 +109,7 @@ func process_cmdline() {
 				if os.Args[3] == "cloudshell" {
 					config.Debug = true
 
-					if isWindows() == true {
+					if isWindows() {
 						config.Command = CMD_WINSSH
 					} else {
 						config.Command = CMD_SSH
@@ -132,7 +132,7 @@ func process_cmdline() {
 		// WINSCP args
 		if strings.HasPrefix(arg, "/rawsettings") {
 			// config.sshFlags = append(config.sshFlags, os.Args[x:]...)
-			config.winscpFlags = os.Args[x:]
+			config.WinscpFlags = os.Args[x:]
 			break
 		}
 		// Proxy
@@ -186,14 +186,14 @@ func process_cmdline() {
 			config.Command = CMD_INFO
 
 		case "ssh":
-			if isWindows() == true {
+			if isWindows() {
 				config.Command = CMD_INLINE_SSH
 			} else {
 				config.Command = CMD_SSH
 			}
 
 		case "bitvise":
-			if isWindows() == true {
+			if isWindows() {
 				config.Command = CMD_BITVISE
 			} else {
 				fmt.Println("Error: This command is only supported on Windows. For Linux use ssh")
@@ -201,7 +201,7 @@ func process_cmdline() {
 			}
 
 		case "winssh":
-			if isWindows() == true {
+			if isWindows() {
 				config.Command = CMD_WINSSH
 			} else {
 				fmt.Println("Error: This command is only supported on Windows. For Linux use ssh")
@@ -237,7 +237,7 @@ func process_cmdline() {
 				config.DstFile = file
 			}
 
-			if config.Debug == true {
+			if config.Debug {
 				fmt.Println("SrcFile:", config.SrcFile)
 				fmt.Println("DstFile:", config.DstFile)
 			}
@@ -270,13 +270,13 @@ func process_cmdline() {
 				config.DstFile = file
 			}
 
-			if config.Debug == true {
+			if config.Debug {
 				fmt.Println("SrcFile:", config.SrcFile)
 				fmt.Println("DstFile:", config.DstFile)
 			}
 
 		case "putty":
-			if isWindows() == true {
+			if isWindows() {
 				config.Command = CMD_PUTTY
 			} else {
 				fmt.Println("Error: This command is only supported on Windows. For Linux use ssh")
@@ -284,7 +284,7 @@ func process_cmdline() {
 			}
 
 		case "winscp":
-			if isWindows() == true {
+			if isWindows() {
 				config.Command = CMD_WINSCP
 			} else {
 				fmt.Println("Error: This command is only supported on Windows. For Linux use ssh")
@@ -326,7 +326,7 @@ func process_cmdline() {
 				os.Exit(1)
 			}
 
-			if isWindows() == true {
+			if isWindows() {
 				fmt.Println("Error: expected a command (info, putty, ssh, winssh, exec, upload, download)")
 			} else {
 				fmt.Println("Error: expected a command (info, ssh, exec, upload, download)")
@@ -340,7 +340,7 @@ func cmd_help() {
 	fmt.Println("Usage: cloudshell [command]")
 	fmt.Println("  cloudshell                            - display cloudshell program help")
 	fmt.Println("  cloudshell info                       - display Cloud Shell information")
-	if isWindows() == true {
+	if isWindows() {
 		fmt.Println("  cloudshell putty                      - connect to Cloud Shell with Putty")
 		fmt.Println("  cloudshell winscp                     - connect to Cloud Shell with WinSCP")
 	}

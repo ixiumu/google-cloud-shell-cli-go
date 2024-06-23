@@ -13,7 +13,7 @@ import (
 	"os"
 	"runtime"
 	// "golang.org/x/crypto/ssh"
-	"github.com/docker/machine/libmachine/ssh"
+	// "github.com/docker/machine/libmachine/ssh"
 )
 
 // var path_winssh =  "C:/Windows/System32/OpenSSH/ssh.exe"
@@ -32,7 +32,7 @@ func exec_winssh(params CloudShellEnv) {
 	sshPort := fmt.Sprint(params.SshPort)
 	sshUrl := sshUsername + "@" + sshHost
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println(key)
 		fmt.Println(sshUsername)
 		fmt.Println(sshHost)
@@ -40,14 +40,14 @@ func exec_winssh(params CloudShellEnv) {
 		fmt.Println(sshUrl)
 	}
 
-	// if config.Debug == true {
+	// if config.Debug {
 	// 	fmt.Println("cmd.exe /C start " + path_winssh + " " + sshUrl + " -p " + sshPort + " -i " + key)
 	// }
 
 	// cmd := exec.Command("cmd.exe", "/C", "start", path_winssh, sshUrl, "-p", sshPort, "-i", key)
 
 	if config.Proxy == "v2ray" {
-		if config.Debug == true {
+		if config.Debug {
 			fmt.Println("Proxy: V2ray")
 		}
 
@@ -55,7 +55,7 @@ func exec_winssh(params CloudShellEnv) {
 		V2ray(sshHost, sshPort)
 		CheckPort("127.0.0.1", "8022")
 	} else if config.Proxy == "shadowsocks" {
-		if config.Debug == true {
+		if config.Debug {
 			fmt.Println("Proxy: shadowsocks")
 		}
 
@@ -77,12 +77,12 @@ func exec_winssh(params CloudShellEnv) {
 		}
 	}
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Use:", sshBinaryPath)
 	}
 
 	auth := Auth{Keys: []string{key}}
-	sshPortInt, err := strconv.Atoi(sshPort)
+	sshPortInt, _ := strconv.Atoi(sshPort)
 
 	client, err := NewExternalClient(sshBinaryPath, sshUsername, sshHost, sshPortInt, &auth, config.sshFlags)
 	if err != nil {
@@ -95,7 +95,7 @@ func exec_winssh(params CloudShellEnv) {
 
 	// "curl -sSL https://raw.githubusercontent.com/ixiumu/google-cloud-shell-cli-go/patch-1/scripts-remote/heartbeats | sh & bash"
 	err = client.Shell()
-	if err != nil && config.Debug == true && err.Error() != "exit status 255" {
+	if err != nil && config.Debug && err.Error() != "exit status 255" {
 		fmt.Println("Failed to request shell - ", err)
 		// return
 	}
@@ -153,7 +153,7 @@ func V2ray(sshHost string, sshPort string) {
 		return
 	}
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Proxy Config:", url)
 	}
 
@@ -200,7 +200,7 @@ func ShadowSocks(sshHost string, sshPort string) {
 		return
 	}
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Proxy:", ssArgs)
 	}
 
@@ -221,14 +221,14 @@ func CheckUrlConfig(sshHost string, sshPort string) {
 		defer resp.Body.Close()
 
 		// if resp.StatusCode != http.StatusOK {
-		// 	if config.Debug == true {
+		// 	if config.Debug {
 		// 		fmt.Println("Error: status code", resp.StatusCode)
 		// 	}
 		// 	continue
 		// }
 
 		if resp.StatusCode == 200 {
-			if config.Debug == true {
+			if config.Debug {
 				fmt.Println("CheckPort: status code", resp.StatusCode)
 			}
 			break
@@ -243,14 +243,14 @@ func CheckPort(host string, port string) {
 		timeout := time.Second
 		conn, err := net.DialTimeout("tcp", net.JoinHostPort(host, port), timeout)
 		if err != nil {
-			if config.Debug == true {
+			if config.Debug {
 				fmt.Println("Connecting error:", err)
 			}
 			continue
 		}
 		if conn != nil {
 			defer conn.Close()
-			if config.Debug == true {
+			if config.Debug {
 				fmt.Println("Opened", net.JoinHostPort(host, port))
 			}
 			break
@@ -262,11 +262,11 @@ func (client *ExternalClient) HeartBeats() {
 
 	time.Sleep(10 * time.Second)
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Print("Start Send HeartBeats")
 	}
 
-	for true {
+	for {
 		args := append(client.BaseArgs, "curl -I -H \"Devshell-Vm-Ip-Address:${DEVSHELL_IP_ADDRESS}\" -X POST -s -w %{http_code} -o /dev/null ${DEVSHELL_SERVER_URL}/devshell/vmheartbeat")
 
 		cmd := getSSHCmd(client.BinaryPath, args...)
@@ -276,7 +276,7 @@ func (client *ExternalClient) HeartBeats() {
 			fmt.Print("HeartBeats error: ", err)
 		}
 
-		if config.Debug == true {
+		if config.Debug {
 			fmt.Print("HeartBeats: ", string(output))
 		}
 
@@ -317,7 +317,7 @@ var (
 		"-o", "StrictHostKeyChecking=no",
 		"-o", "UserKnownHostsFile=/dev/null",
 	}
-	defaultClientType = External
+	// defaultClientType = External
 )
 
 func NewExternalClient(sshBinaryPath, user, host string, port int, auth *Auth, flags []string) (*ExternalClient, error) {
@@ -368,7 +368,7 @@ func NewExternalClient(sshBinaryPath, user, host string, port int, auth *Auth, f
 
 	client.BaseArgs = args
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("sshArgs:", client.BaseArgs)
 	}
 
@@ -444,39 +444,39 @@ func closeConn(c io.Closer) {
 	}
 }
 
-func exec_inline_ssh(params CloudShellEnv) {
-	key, err := env_get_ssh_pkey()
+// func exec_inline_ssh(params CloudShellEnv) {
+// 	key, err := env_get_ssh_pkey()
 
-	if err != nil {
-		fmt.Println("\nTip: Run the command: \"gcloud alpha cloud-shell ssh --dry-run\" to setup Cloud Shell SSH keys")
-		return
-	}
+// 	if err != nil {
+// 		fmt.Println("\nTip: Run the command: \"gcloud alpha cloud-shell ssh --dry-run\" to setup Cloud Shell SSH keys")
+// 		return
+// 	}
 
-	sshUsername := params.SshUsername
-	sshHost := params.SshHost
-	sshPort := fmt.Sprint(params.SshPort)
-	sshUrl := sshUsername + "@" + sshHost
+// 	sshUsername := params.SshUsername
+// 	sshHost := params.SshHost
+// 	sshPort := fmt.Sprint(params.SshPort)
+// 	sshUrl := sshUsername + "@" + sshHost
 
-	if config.Debug == true {
-		fmt.Println(key)
-		fmt.Println(sshUsername)
-		fmt.Println(sshHost)
-		fmt.Println(sshPort)
-		fmt.Println(sshUrl)
-	}
+// 	if config.Debug {
+// 		fmt.Println(key)
+// 		fmt.Println(sshUsername)
+// 		fmt.Println(sshHost)
+// 		fmt.Println(sshPort)
+// 		fmt.Println(sshUrl)
+// 	}
 
-	auth := ssh.Auth{Keys: []string{key}}
-	sshPortInt, err := strconv.Atoi(sshPort)
-	client, err := ssh.NewClient(sshUsername, sshHost, sshPortInt, &auth)
-	if err != nil {
-		fmt.Errorf("Failed to create new client - %s", err)
-		return
-	}
+// 	auth := ssh.Auth{Keys: []string{key}}
+// 	sshPortInt, err := strconv.Atoi(sshPort)
+// 	client, err := ssh.NewClient(sshUsername, sshHost, sshPortInt, &auth)
+// 	if err != nil {
+// 		fmt.Errorf("Failed to create new client - %s", err)
+// 		return
+// 	}
 
-	err = client.Shell()
-	if err != nil && err.Error() != "exit status 255" {
-		fmt.Errorf("Failed to request shell - %s", err)
-		return
-	}
+// 	err = client.Shell()
+// 	if err != nil && err.Error() != "exit status 255" {
+// 		fmt.Errorf("Failed to request shell - %s", err)
+// 		return
+// 	}
 
-}
+// }

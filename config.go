@@ -55,7 +55,7 @@ type Config struct {
 	sshFlags []string
 
 	// Command line winscp options
-	winscpFlags []string
+	WinscpFlags []string
 
 	// Path
 	AbsPath     string
@@ -133,18 +133,13 @@ func init_config() error {
 		config.UrlFetch = configJson.UrlFetch
 
 		if configJson.WinscpFlags != "" {
-			config.winscpFlags = append([]string{"/rawsettings"}, strings.Fields(configJson.WinscpFlags)...)
+			config.WinscpFlags = append([]string{"/rawsettings"}, strings.Fields(configJson.WinscpFlags)...)
 		}
 
+		config.ClientSecretsFile = configJson.ClientSecretsFile
 	}
-
-	config.ClientSecretsFile = configJson.ClientSecretsFile
 
 	// fmt.Println("Client Secrets File:", config.ClientSecretsFile)
-
-	if configJson.WinscpFlags != "" {
-		config.WinscpFlags = append([]string{"/rawsettings"}, strings.Fields(configJson.WinscpFlags)...)
-	}
 
 	process_cmdline()
 

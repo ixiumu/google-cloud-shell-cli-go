@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -128,7 +129,7 @@ func loadUserCredentials(filename string) (UserCredentials, error) {
 }
 
 func saveUserCredentials(filename string, creds UserCredentials) error {
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Save Credentials to:", filename)
 	}
 
@@ -209,14 +210,14 @@ func doRefresh(filename string) (string, string, bool) {
 	// fmt.Println(time.Now())
 
 	if time.Now().Before(t) {
-		if config.Debug == true {
+		if config.Debug {
 			fmt.Println("Saved credentials (Access Token) have not expired")
 		}
 
-		return creds.AccessToken, true
+		return creds.AccessToken, creds.IDToken, true
 	}
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Must Refresh Token")
 	}
 
@@ -285,7 +286,7 @@ func doRefresh(filename string) (string, string, bool) {
 	// email, err := get_email_address(tokens.AccessToken)
 
 	// if err == nil {
-	// 	if config.Debug == true {
+	// 	if config.Debug {
 	// 		fmt.Println("Email:", email)
 	// 	}
 
@@ -456,7 +457,7 @@ func get_tokens() (string, string, error) {
 	// Engine when interfacing with Cloud Shell.
 	//************************************************************
 
-	if config.Flags.Adc == true {
+	if config.Flags.Adc {
 		return get_sa_tokens()
 	}
 
@@ -467,7 +468,7 @@ func get_tokens() (string, string, error) {
 		if fileExists(SavedUserCredentials) {
 			accessToken, idToken, valid := doRefresh(SavedUserCredentials)
 
-			if valid == true {
+			if valid {
 				// fmt.Println("Access Token: ", accessToken)
 				// fmt.Println("ID Token:     ", idToken)
 
@@ -488,7 +489,7 @@ func get_tokens() (string, string, error) {
 
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return "", "", err
 	}
 
 	//************************************************************
@@ -520,10 +521,10 @@ func get_tokens() (string, string, error) {
 		url += "&login_hint=" + config.Flags.Login
 	}
 
-	if isWindows() == true {
+	if isWindows() {
 		url += "&redirect_uri=http://localhost:9000"
 	} else {
-		if flag_desktop == true {
+		if flag_desktop {
 			url += "&redirect_uri=http://localhost:9000"
 		} else {
 			url += "&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
@@ -547,13 +548,13 @@ func get_tokens() (string, string, error) {
 		}
 	}
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Python Path:", python_path)
 	}
 
 	//************************************************************
 
-	if isWindows() == true {
+	if isWindows() {
 		chrome, err := FindChromeBrowser()
 
 		var cmd *exec.Cmd
@@ -603,7 +604,7 @@ func get_tokens() (string, string, error) {
 		log.Fatal("Error: Missing OAuth2 Code")
 	}
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("OAuth2 Code:", string(out))
 	}
 
@@ -702,7 +703,7 @@ func processAuthCode(secrets ClientSecrets, auth_code string, flag_oob bool) (st
 		return "", "", err
 	}
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("BODY:", string(body))
 	}
 
@@ -719,7 +720,7 @@ func processAuthCode(secrets ClientSecrets, auth_code string, flag_oob bool) (st
 		return "", "", err
 	}
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("JSON:", tokens)
 	}
 
@@ -776,7 +777,7 @@ func processAuthCode(secrets ClientSecrets, auth_code string, flag_oob bool) (st
 	//
 	//************************************************************
 
-	if config.Debug == true {
+	if config.Debug {
 		debug_displayAccessToken(creds.AccessToken)
 		// debug_displayUserInfo(creds.AccessToken)
 		// debug_displayIDToken(creds.AccessToken, creds.IDToken)

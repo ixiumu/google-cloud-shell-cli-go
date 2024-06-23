@@ -72,7 +72,7 @@ func cloud_shell_get_environment(accessToken string, flag_info bool) (CloudShell
 
 	req.SetHeaders(hdrs)
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Access Token:", accessToken)
 		fmt.Println("ProjectId:", config.ProjectId)
 	}
@@ -95,7 +95,7 @@ func cloud_shell_get_environment(accessToken string, flag_info bool) (CloudShell
 		return params, err
 	}
 
-	if flag_info == true {
+	if flag_info {
 		fmt.Println("Cloud Shell Info:")
 		fmt.Println(string(body))
 	}
@@ -125,7 +125,7 @@ func cloudshell_start(accessToken string) error {
 	//
 	//************************************************************
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Request users.environment.start")
 	}
 
@@ -160,7 +160,7 @@ func cloudshell_start(accessToken string) error {
 		return err
 	}
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("")
 		fmt.Println("************************************************************")
 		fmt.Println("Cloud Shell Info:")
@@ -204,7 +204,7 @@ func cloud_shell_create_publickeys(accessToken string) error {
 		"Authorization":       "Bearer " + accessToken,
 		"X-Goog-User-Project": config.ProjectId})
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Access Token:", accessToken)
 		fmt.Println("ProjectId:", config.ProjectId)
 	}
@@ -259,7 +259,7 @@ func cloud_shell_create_publickeys(accessToken string) error {
 		return err
 	}
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Body:", params)
 	}
 
@@ -283,18 +283,18 @@ func env_get_ssh_key(filename string, ext string) (string, error) {
 		return "", err
 	}
 
-	// if isWindows() == true {
+	// if isWindows() {
 	// 	path = homepath + "\\.ssh\\" + filename + ext
 	// } else {
 	// 	path = homepath + "/.ssh/" + filename + ext
 	// }
 
 	path := homepath + "/.ssh/" + filename + ext
-	if fileExists(path) == false {
+	if !fileExists(path) {
 		path = homepath + "/.ssh/id_rsa_cloudshell" + ext
-		if fileExists(path) == false {
+		if !fileExists(path) {
 			path = homepath + "/.ssh/id_rsa" + ext
-			if fileExists(path) == false {
+			if !fileExists(path) {
 				err = errors.New("SSH Key does not exist")
 				fmt.Println("Error:", err)
 				fmt.Println("File:", homepath+"/.ssh/id_rsa"+ext)
@@ -306,7 +306,7 @@ func env_get_ssh_key(filename string, ext string) (string, error) {
 		}
 	}
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Path:", path)
 	}
 
@@ -349,14 +349,15 @@ func call_cloud_shell(accessToken string) {
 	params, err := cloud_shell_get_environment(accessToken, flag_info)
 
 	if err != nil {
+		fmt.Println("Error:", err)
 		return
 	}
 
 	if config.Command == CMD_INFO {
 		return
 	}
-	if params.State == "DISABLED" {
-		if config.Debug == true {
+	if params.State == "DISABLED" || params.State == "SUSPENDED" {
+		if config.Debug {
 			fmt.Println("CloudShell State:", params.State)
 		}
 
@@ -401,14 +402,14 @@ func call_cloud_shell(accessToken string) {
 			timeout := time.Second
 			conn, err := net.DialTimeout("tcp", net.JoinHostPort(host, port), timeout)
 			if err != nil {
-				if config.Debug == true {
+				if config.Debug {
 					fmt.Println("Connecting error:", err)
 				}
 				continue
 			}
 			if conn != nil {
 				defer conn.Close()
-				if config.Debug == true {
+				if config.Debug {
 					fmt.Println("Opened", net.JoinHostPort(host, port))
 				}
 				break
@@ -422,12 +423,19 @@ func call_cloud_shell(accessToken string) {
 		return
 	}
 
+	if config.Debug {
+		fmt.Println("Command:", config.Command)
+	}
+
 	if config.Command == CMD_PUTTY {
+		fmt.Println("Your Cloud Shell machine is RUNNING, connecting...")
 		exec_putty(params)
 	}
 
 	if config.Command == CMD_INLINE_SSH {
-		exec_inline_ssh(params)
+		// exec_inline_ssh(params)
+		fmt.Println("Your Cloud Shell machine is RUNNING, connecting...")
+		exec_winssh(params)
 	}
 
 	if config.Command == CMD_WINSSH {
@@ -436,6 +444,7 @@ func call_cloud_shell(accessToken string) {
 	}
 
 	if config.Command == CMD_SSH {
+		fmt.Println("Your Cloud Shell machine is RUNNING, connecting...")
 		exec_ssh(params)
 	}
 

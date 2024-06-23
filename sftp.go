@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"time"
+
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/text/language"
@@ -36,7 +37,7 @@ func sftp_download(params CloudShellEnv) {
 
 	host := sshHost + ":" + sshPort
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Dial")
 		fmt.Println(host)
 	}
@@ -68,7 +69,7 @@ func sftp_download(params CloudShellEnv) {
 		log.Fatal(err)
 	}
 	defer srcFile.Close()
- 
+
 	// create destination file
 	fmt.Println("create destination file")
 	dstFile, err := os.Create(config.DstFile)
@@ -108,7 +109,7 @@ func sftp_upload(params CloudShellEnv) {
 
 	host := sshHost + ":" + sshPort
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Dial")
 		fmt.Println(host)
 	}
@@ -146,7 +147,7 @@ func sftp_upload(params CloudShellEnv) {
 		log.Fatal(err)
 	}
 	defer dstFile.Close()
- 
+
 	// copy source file to destination file
 	bytes, err := io.Copy(dstFile, srcFile)
 	if err != nil {
@@ -165,7 +166,7 @@ func print_transfer_stats(total_time time.Duration, bytes int64, flag bool) {
 	// Convert to milliseconds
 	ms := int64(total_time) / 1000000
 
-	if (bytes == 0) {
+	if bytes == 0 {
 		fmt.Printf("%v bytes in %s - Speed 0 KBS\n", bytes, total_time)
 	} else {
 		kbs := bytes / ms

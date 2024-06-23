@@ -9,14 +9,14 @@ import (
 
 func isWindows() bool {
 	if runtime.GOOS == "windows" {
-		return true;
+		return true
 	}
 
 	return false
 }
 
 func check_os() error {
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Runtime Environment:")
 		fmt.Printf("    OS: %s\n", runtime.GOOS)
 		fmt.Printf("    ARCH: %s\n", runtime.GOARCH)

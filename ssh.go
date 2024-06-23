@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"time"
+
 	"golang.org/x/crypto/ssh"
 )
 
@@ -68,7 +69,7 @@ func exec_command(params CloudShellEnv) {
 
 	defer connection.Close()
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Connect")
 	}
 
@@ -88,7 +89,7 @@ func exec_command(params CloudShellEnv) {
 	session.Stdout = &stdoutBuf
 	session.Stderr = &stderrBuf
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println("Run Command:", config.RemoteCommand)
 	}
 
@@ -110,7 +111,7 @@ func exec_ssh(params CloudShellEnv) {
 	sshPort := fmt.Sprint(params.SshPort)
 	sshUrl := sshUsername + "@" + sshHost
 
-	if config.Debug == true {
+	if config.Debug {
 		fmt.Println(key)
 		fmt.Println(sshUsername)
 		fmt.Println(sshHost)
@@ -118,7 +119,7 @@ func exec_ssh(params CloudShellEnv) {
 		fmt.Println(sshUrl)
 	}
 
-	for x:= 0; x < 3; x++ {
+	for x := 0; x < 3; x++ {
 		if x > 0 {
 			fmt.Println("Retrying ...")
 
